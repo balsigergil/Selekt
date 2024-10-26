@@ -1,0 +1,60 @@
+[tabindex="0"]:focus {
+  outline: 1px solid blue;
+}
+
+.selektt-hidden {
+  display: none;
+}
+
+.selektt {
+  position: relative;
+}
+
+.selektt-field {
+  cursor: default;
+  user-select: none;
+}
+
+.selektt-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  background-color: #fff;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.selektt.selektt-open .selektt-dropdown {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.selektt-input {
+  width: 100%;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.selektt-listbox {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+.selektt-option {
+  cursor: pointer;
+  user-select: none;
+}
+
+.selektt-option.selektt-highlighted {
+  background-color: lightblue;
+}
