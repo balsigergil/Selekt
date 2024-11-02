@@ -1,21 +1,17 @@
 {
   "name": "selektt",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "type": "module",
   "files": [
     "dist"
   ],
   "main": "dist/selektt.umd.cjs",
   "module": "dist/selektt.js",
-  "exports": {
-    ".": {
-      "import": "./dist/selektt.js",
-      "require": "./dist/selektt.umd.cjs"
-    }
-  },
+  "types": "dist/lib/main.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "types": "tsc --declaration --emitDeclarationOnly --noEmit false --outDir dist",
     "preview": "vite preview"
   },
   "devDependencies": {

@@ -1,5 +1,4 @@
 import "./style.css";
-import "./classic-theme.css";
 
 class Selektt {
   readonly #select: HTMLSelectElement;
@@ -35,7 +34,7 @@ class Selektt {
       );
       if (this.#label) {
         this.#label.addEventListener("click", () => {
-          this.open();
+          this.#field.focus();
         });
       }
     } else {
@@ -44,12 +43,10 @@ class Selektt {
 
     this.#select.style.display = "none";
     this.#select.ariaHidden = "true";
-    const parent = this.#select.parentElement;
 
     // Create the initial structure
     this.#wrapper = document.createElement("div");
     this.#wrapper.classList.add("selektt");
-    this.#wrapper.append(this.#select);
 
     this.#field = document.createElement("div");
     this.#field.classList.add("selektt-field");
@@ -142,17 +139,15 @@ class Selektt {
     this.#dropdown.append(this.#listbox);
     this.#wrapper.append(this.#dropdown);
 
-    parent?.append(this.#wrapper);
+    // Insert the wrapper after the select element
+    this.#select.insertAdjacentElement("afterend", this.#wrapper);
 
     this.#populateDropdown();
 
     // Global event listeners
     // TODO: Remove event listeners when the element is removed from the DOM
     document.addEventListener("click", (e) => {
-      if (
-        !this.#wrapper.contains(e.target as Node) &&
-        (!this.#label || !this.#label.contains(e.target as Node))
-      ) {
+      if (!this.#wrapper.contains(e.target as Node)) {
         this.close(false);
       }
     });

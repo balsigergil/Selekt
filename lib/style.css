@@ -10,6 +10,7 @@
   --selektt-chevron-size: 18px;
 
   position: relative;
+  font-size: 0.875rem;
 }
 
 .selektt-hidden {
@@ -25,6 +26,13 @@
   align-items: center;
   cursor: default;
   user-select: none;
+  border: 1px solid var(--selektt-border-color);
+  padding: 0.5em;
+  border-radius: var(--selektt-border-radius);
+}
+
+.selektt-invalid .selektt-field {
+  outline: 2px solid var(--selektt-invalid-border-color);
 }
 
 .selektt-values {
@@ -51,6 +59,10 @@
   pointer-events: none;
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--selektt-border-color);
+  border-radius: var(--selektt-border-radius);
+  transform: translateY(0.25rem);
+  overflow: hidden;
 }
 
 .selektt.selektt-open .selektt-dropdown {
@@ -64,6 +76,7 @@
   appearance: none;
   border: none;
   outline: none;
+  padding: 0.5rem;
 }
 
 .selektt-listbox {
@@ -73,10 +86,23 @@
   max-height: var(--selektt-dropdown-max-height);
   overflow-y: auto;
   overflow-x: hidden;
-  border-top: none;
+  border-top: 1px solid var(--selektt-border-color);
 }
 
 .selektt-option {
   cursor: pointer;
   user-select: none;
+  padding: 0.25em 0.5em;
+}
+
+.selektt-option.selektt-placeholder {
+  color: var(--selektt-placeholder-color);
+}
+
+.selektt-option.selektt-selected {
+  background-color: var(--selektt-selected-color);
+}
+
+.selektt-option.selektt-highlighted {
+  background-color: var(--selektt-highlight-color);
 }
