@@ -8,21 +8,28 @@
   <body>
     <div>
       <h1>Selektt</h1>
-      <input type="text" />
-      <div>
-        <label for="fruits">Fruit</label>
-        <select name="fruits" id="fruits">
-          <option value="apple">Apple</option>
-          <option value="banana">Banana</option>
-          <option value="cherry" selected>Cherry</option>
-          <option value="date">Date</option>
-          <option value="elderberry">Elderberry</option>
-          <option value="fig">Fig</option>
-          <option value="grape">Grape</option>
-          <option value="honeydew">Honeydew</option>
-          <option value="kiwi">Kiwi</option>
-        </select>
-      </div>
+      <form action="">
+        <input type="text" name="text" />
+        <button type="submit">Submit</button>
+      </form>
+      <form action="/" method="get">
+        <div>
+          <label for="fruits">Fruit</label>
+          <select name="fruits" id="fruits" required>
+            <option value="">---------</option>
+            <option value="apple">Apple</option>
+            <option value="banana">Banana</option>
+            <option value="cherry">Cherry</option>
+            <option value="date">Date</option>
+            <option value="elderberry">Elderberry</option>
+            <option value="fig">Fig</option>
+            <option value="grape">Grape</option>
+            <option value="honeydew">Honeydew</option>
+            <option value="kiwi">Kiwi</option>
+          </select>
+        </div>
+        <input type="submit" value="Submit" />
+      </form>
       <div>
         <label for="country">Fruit</label>
         <select id="country" name="country">

@@ -1,10 +1,14 @@
 import "./style.css";
+import "./classic-theme.css";
 
 class Selektt {
   readonly #select: HTMLSelectElement;
+  readonly #label: HTMLLabelElement | null = null;
   readonly #wrapper: HTMLDivElement;
 
   readonly #field: HTMLDivElement;
+  readonly #values: HTMLDivElement;
+  readonly #chevron: HTMLDivElement;
 
   readonly #dropdown: HTMLDivElement;
   readonly #input: HTMLInputElement;
@@ -22,25 +26,33 @@ class Selektt {
 
     this.#select = el as HTMLSelectElement;
 
-    if (el.id) {
-      this.#id = el.id;
-      el.id = "";
+    if (this.#select.id) {
+      this.#id = this.#select.id;
+      this.#select.id = "";
+
+      this.#label = document.querySelector<HTMLLabelElement>(
+        `label[for="${this.#id}"]`,
+      );
+      if (this.#label) {
+        this.#label.addEventListener("click", () => {
+          this.open();
+        });
+      }
     } else {
       this.#id = Math.random().toString(36).substring(2, 15);
     }
 
-    this.#select.tabIndex = -1;
     this.#select.style.display = "none";
-    const parent = el.parentElement;
+    this.#select.ariaHidden = "true";
+    const parent = this.#select.parentElement;
 
     // Create the initial structure
     this.#wrapper = document.createElement("div");
     this.#wrapper.classList.add("selektt");
-    this.#wrapper.append(el);
+    this.#wrapper.append(this.#select);
 
     this.#field = document.createElement("div");
     this.#field.classList.add("selektt-field");
-    this.#field.textContent = "Select an option...";
     this.#field.tabIndex = 0;
     this.#field.addEventListener("click", (e) => {
       e.preventDefault();
@@ -58,7 +70,19 @@ class Selektt {
         this.toggle();
       }
     });
+    this.#values = document.createElement("div");
+    this.#values.classList.add("selektt-values");
+    this.#values.textContent = "Select an option...";
+    this.#chevron = document.createElement("div");
+    this.#chevron.classList.add("selektt-chevron");
+    this.#chevron.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+    this.#field.append(this.#values, this.#chevron);
     this.#wrapper.append(this.#field);
+
+    this.#select.addEventListener("invalid", (e) => {
+      e.preventDefault();
+      this.#wrapper.classList.add("selektt-invalid");
+    });
 
     this.#dropdown = document.createElement("div");
     this.#dropdown.classList.add("selektt-dropdown");
@@ -73,10 +97,11 @@ class Selektt {
     this.#input.setAttribute("aria-controls", this.#id + "-listbox");
     this.#input.ariaExpanded = "false";
     this.#input.id = this.#id;
+    this.#input.placeholder = "Search...";
     this.#input.addEventListener("input", () => {
       this.#search = this.#input.value;
       this.#highlighted = -1;
-      this.renderDropdown();
+      this.#renderDropdown();
     });
     this.#input.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
@@ -124,36 +149,13 @@ class Selektt {
     // Global event listeners
     // TODO: Remove event listeners when the element is removed from the DOM
     document.addEventListener("click", (e) => {
-      if (!this.#wrapper.contains(e.target as Node)) {
-        e.preventDefault();
-        e.stopPropagation();
+      if (
+        !this.#wrapper.contains(e.target as Node) &&
+        (!this.#label || !this.#label.contains(e.target as Node))
+      ) {
         this.close(false);
       }
     });
-  }
-
-  renderDropdown() {
-    const options = this.#options;
-    for (let i = 0; i < options.length; i++) {
-      const option = options[i];
-      option.classList.remove("selektt-hidden");
-      if (
-        this.#search &&
-        !option.textContent?.toLowerCase().includes(this.#search.toLowerCase())
-      ) {
-        option.classList.add("selektt-hidden");
-      } else if (this.#highlighted === -1) {
-        this.#highlighted = i;
-      }
-
-      if (i === this.#highlighted) {
-        option.classList.add("selektt-highlighted");
-        option.scrollIntoView({ block: "nearest" });
-        this.#input.setAttribute("aria-activedescendant", option.id);
-      } else {
-        option.classList.remove("selektt-highlighted");
-      }
-    }
   }
 
   open() {
@@ -163,7 +165,7 @@ class Selektt {
     this.#highlighted = this.#selected;
     this.#input.setAttribute("aria-expanded", "true");
     this.#listbox.setAttribute("aria-hidden", "false");
-    this.renderDropdown();
+    this.#renderDropdown();
     this.#wrapper.classList.add("selektt-open");
     this.#input.focus();
   }
@@ -199,33 +201,68 @@ class Selektt {
    */
   #populateDropdown() {
     this.#listbox.innerHTML = "";
-    const options = this.#select.querySelectorAll("option");
-    for (let i = 0; i < options.length; i++) {
-      const option = options[i];
+    const rawOptions = this.#select.querySelectorAll("option");
+    for (let i = 0; i < rawOptions.length; i++) {
+      const option = rawOptions[i];
       const item = document.createElement("li");
       item.classList.add("selektt-option");
+      if (option.value === "") {
+        item.classList.add("selektt-placeholder");
+      }
       item.role = "option";
       item.id = this.#id + "-option-" + i;
       item.textContent = option.textContent;
       item.addEventListener("click", () => this.#selectOption(i));
       item.addEventListener("mousemove", () => {
         this.#highlighted = i;
-        this.renderDropdown();
+        this.#renderDropdown();
       });
       this.#listbox.append(item);
 
       if (option.selected) {
-        this.#field.textContent = item.textContent;
+        this.#values.textContent = item.textContent;
         this.#selected = i;
+      }
+    }
+  }
+
+  #renderDropdown() {
+    const options = this.#options;
+    for (let i = 0; i < options.length; i++) {
+      const option = options[i];
+      option.classList.remove("selektt-hidden");
+      if (
+        this.#search &&
+        !option.textContent?.toLowerCase().includes(this.#search.toLowerCase())
+      ) {
+        option.classList.add("selektt-hidden");
+      } else if (this.#highlighted === -1) {
+        this.#highlighted = i;
+      }
+
+      if (i === this.#highlighted) {
+        option.classList.add("selektt-highlighted");
+        option.scrollIntoView({ block: "nearest" });
+        this.#input.setAttribute("aria-activedescendant", option.id);
+      } else {
+        option.classList.remove("selektt-highlighted");
+      }
+
+      if (i === this.#selected) {
+        option.classList.add("selektt-selected");
+      } else {
+        option.classList.remove("selektt-selected");
       }
     }
   }
 
   #selectOption(index: number) {
     const option = this.#select.querySelectorAll("option")[index];
-    this.#field.textContent = option.textContent;
+    this.#values.textContent = option.textContent;
+    // option.selected = true;
     this.#select.value = option.value;
     this.#selected = index;
+    this.#wrapper.classList.remove("selektt-invalid");
     this.close();
   }
 
@@ -246,7 +283,7 @@ class Selektt {
       }
       if (next && i < optionsLength) {
         this.#highlighted = i;
-        this.renderDropdown();
+        this.#renderDropdown();
       }
     }
   }
@@ -269,7 +306,7 @@ class Selektt {
       }
       if (prev && i >= 0) {
         this.#highlighted = i;
-        this.renderDropdown();
+        this.#renderDropdown();
       }
     }
   }
